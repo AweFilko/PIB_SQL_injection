@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+  <div class="dashboard-container">
+    <h2>Welcome, {{ user[1] }}</h2>
+
+    <!-- Profile card -->
+    <div class="profile-card">
+      {% if profile %}
+        <div class="profile-row"><strong>Username:</strong> {{ profile.username }}</div>
+        <div class="profile-row"><strong>Full name:</strong> {{ profile.full_name }}</div>
+        <div class="profile-row"><strong>Email:</strong> {{ profile.email }}</div>
+        <div class="profile-row"><strong>City:</strong> {{ profile.city }}</div>
+        <div class="profile-row"><strong>Phone:</strong> {{ profile.phone }}</div>
+        <div class="profile-row"><strong>Bio:</strong> {{ profile.bio }}</div>
+      {% else %}
+        <div class="profile-row">Profile information unavailable.</div>
+      {% endif %}
+    </div>
+
+    <!-- Search bar -->
+    <form method="GET" action="{{ url_for('dashboard') }}" class="search-form" role="search" aria-label="User search">
+      <input type="search" name="q" placeholder="Search users by username or email..." value="{{ q }}" aria-label="Search users" class="search-input" />
+      <button type="submit" class="search-btn">Search</button>
+    </form>
+
+    <!-- Search results -->
+    {% if q %}
+      <h3>Search results for "{{ q }}"</h3>
+      {% if results %}
+        <table class="results-table">
+          <thead>
+            <tr><th>Username</th><th>Email</th></tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+              <tr>
+                <td>{{ r[1] }}</td>
+                <td>{{ r[2] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="no-results">No results found.</div>
+      {% endif %}
+    {% endif %}
+
+    <!-- Comments -->
+    <h3 style="margin-top:18px;">Comments</h3>
+    {% if comments %}
+      <ul style="text-align:left; width:100%; list-style:none; padding-left:0;">
+        {% for c in comments %}
+          <li style="padding:8px 0; border-bottom:1px solid #eee;">
+            <div><strong>Comment #{{ c.id }}</strong> <small>({{ c.created_at }})</small></div>
+            <div>{{ c.content }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="no-results">No comments found.</div>
+    {% endif %}
+
+    <!-- Orders -->
+    <h3 style="margin-top:18px;">Orders</h3>
+    {% if orders %}
+      <table class="results-table">
+        <thead><tr><th>Order ID</th><th>Qty</th><th>Price</th><th>Created</th></tr></thead>
+        <tbody>
+          {% for o in orders %}
+            <tr>
+              <td>{{ o.id }}</td>
+              <td>{{ o.quantity }}</td>
+              <td>{{ o.price }}</td>
+              <td>{{ o.created_at }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="no-results">No orders found.</div>
+    {% endif %}
+
+    <form method="GET" action="{{ url_for('logout') }}">
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+  </div>
+{% endblock %}
