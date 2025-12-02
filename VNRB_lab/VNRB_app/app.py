@@ -7,8 +7,8 @@ from psycopg2 import OperationalError, DatabaseError
 # --- Configuration ---
 DB_HOST = os.getenv("LABDB_HOST", "localhost")
 DB_NAME = os.getenv("LABDB_NAME", "labdb")
-DB_USER = os.getenv("LABDB_USER", "app_user_vul")
-DB_PASS = os.getenv("LABDB_PASS", "app_user_pass")
+DB_USER = os.getenv("LABDB_USER", "app_user_vul")#sec_app_user
+DB_PASS = os.getenv("LABDB_PASS", "app_user_pass")#123
 FLASK_SECRET = os.getenv("FLASK_SECRET", "testing_secret_for_local_only")
 
 app = Flask(__name__)
@@ -24,28 +24,17 @@ def get_db_connection():
     except OperationalError:
         logger.exception("Failed to open DB connection")
         raise
-#sql = f"SELECT id, username, email FROM users WHERE username = '{q}' OR email '{q}' LIMIT 20"
+
 def user_login(name: str, password: str, cursor):
-    # intentionally vulnerable (left as-is for your experiments)
     query = f"SELECT * FROM users WHERE username = '{name}' AND password_hash = '{password}'"
     logger.debug("Executing user lookup (vulnerable) for username=%s", name)
     cursor.execute(query)
     return cursor.fetchone()
 
+# ' or SELECT CASE WHEN EXISTS (SELECT 1 FROM users WHERE username = 'admin') THEN pg_sleep(5) END;--
+#' OR (SELECT CASE WHEN EXISTS (SELECT 1 FROM users WHERE username='admin') THEN pg_sleep(5) END)=0--
+
 def get_user_joined_info_vulnerable(username: str, cursor):
-    """
-    Intentionally vulnerable joined query. Returns all rows from:
-      users us
-      JOIN comments c on us.id = c.user_id
-      JOIN orders o on c.id = o.user_id
-      JOIN profiles p on us.id = p.user_id
-    The returned tuple layout is assumed to follow this order (based on the sample you provided):
-      users:   (u0:id, u1:username, u2:password, u3:email, u4:role, u5:created_at)
-      comments:(c0:id, c1:user_id, c2:content, c3:created_at)
-      orders:  (o0:id, o1:user_id_or_comment_id, o2:?, o3:quantity, o4:price, o5:created_at)
-      profiles:(p0:id, p1:user_id, p2:full_name, p3:bio, p4:city, p5:phone)
-    If your real schema differs, adjust the index constants below.
-    """
     sql = (
         "SELECT * FROM users us "
         "JOIN comments c on us.id = c.user_id "

